@@ -15,7 +15,16 @@ class CLogReader
                                                 // false - конец файла или ошибка
    private:
        bool ReadChunk();
+       void badCharHeuristic(const char *filter, int size);
+
        FILE *fptr;
-       char data[1024];
+       char txt[1024];
+       int textPosition = -1;
+
+       char filter[100];
+       int  filterLength = -1;
+
+       static const int NO_OF_CHARS = 256;
+       int badchar[NO_OF_CHARS];
 
 };
