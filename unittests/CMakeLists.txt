@@ -8,7 +8,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 # Link runTests with what we want to test and the GTest and pthread library
 add_library(tests_lib STATIC
-    testblock.h testblock.cpp)
+    testclogreader.h testclogreader.cpp)
 
 target_include_directories(tests_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}

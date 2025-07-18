@@ -1,61 +1,37 @@
 #include "clogreader.h"
 
-#include <stdio.h>
 #include <string.h>
 
-#include <algorithm>
 #include <iostream>
 
 #include <sys/mman.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 
-void read_file_mmap(const char* filename) {
-    int fd = open(filename, O_RDONLY);
-    if (fd == -1) {
-        perror("open");
-        return;
-    }
+bool CLogReader::get_line(char **line, int& lineLength) {
 
-    struct stat sb;
-    if (fstat(fd, &sb) == -1) {
-        perror("fstat");
-        close(fd);
-        return;
-    }
-
-    char* file_data = (char*)mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-    if (file_data == MAP_FAILED) {
-        perror("mmap");
-        close(fd);
-        return;
-    }
-
-    // Process file_data line by line
-    char* line_start = file_data;
-    char* current = file_data;
-    size_t file_size = sb.st_size;
-
-    while (current < file_data + file_size) {
-        if (*current == '\n') {
-            // Process line from line_start to current
-            size_t line_length = current - line_start;
-            // printf("%.*s\n", (int)line_length, line_start);
-
-            line_start = current + 1;
+    while (current_position < start_position + data_size) {
+        if (*current_position == '\n') {
+            lineLength = current_position - line_start;
+            *line = line_start;
+            line_start = current_position + 1;
+            current_position++;
+            return true;
         }
-        current++;
+        current_position++;
     }
 
     // Process last line if no trailing newline
-    if (line_start < current) {
-        size_t line_length = current - line_start;
+    if (line_start < current_position) {
+        lineLength = current_position - line_start;
+        *line = line_start;
+        line_start = current_position + 1;
+        current_position++;
+        return true;
+        //size_t line_length = current_position - line_start;
         // printf("%.*s\n", (int)line_length, line_start);
     }
-
-    munmap(file_data, sb.st_size);
-    close(fd);
+    return false;
 }
 
 CLogReader::CLogReader()
@@ -69,20 +45,35 @@ CLogReader::~CLogReader()
 
 bool CLogReader::Open(const char *filePath)
 {
-    // Opening the file in read mode
-    fptr = fopen("filename.txt", "r");
-
-    // checking if the file is
-    // opened successfully
-    if (fptr == NULL) {
-        printf("The file is not opened.");
+    fileDescriptor = open(filePath, O_RDONLY);
+    if (fileDescriptor == -1) {
+        perror("open");
         return false;
     }
+
+    if (fstat(fileDescriptor, &sb) == -1) {
+        perror("fstat");
+        close(fileDescriptor);
+        return false;
+    }
+
+    start_position = (char*)mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fileDescriptor, 0);
+    if (start_position == MAP_FAILED) {
+        perror("mmap");
+        close(fileDescriptor);
+        return false;
+    }
+
+    line_start = start_position;
+    current_position = start_position;
+    data_size = sb.st_size;
+
     return true;
 }
 void  CLogReader::Close()
 {
-    fclose(fptr);
+    munmap(start_position, sb.st_size);
+    close(fileDescriptor);
 }
 
 bool CLogReader::SetFilter(const char *filter)
@@ -93,18 +84,12 @@ bool CLogReader::SetFilter(const char *filter)
     return true;
 }
 
-bool CLogReader::ReadChunk()
-{
-    if (fgets(txt, 1024, fptr) != NULL) {
-        return true;
-    }
-    return false;
-}
-
-bool CLogReader::GetNextLine(char *buf,const int bufsize)
+bool CLogReader::GetNextLine(char *buf, const int bufsize)
 {
    // int m = pat.size();
     int n = 1024;
+   char *txt;
+   get_line(&txt,n);
 
     int s = 0; // s is shift of the pattern with
         // respect to text
@@ -123,6 +108,9 @@ bool CLogReader::GetNextLine(char *buf,const int bufsize)
         if (j < 0) {
             std::cout << "pattern occurs at shift = " << s
                  << std::endl;
+
+            strncpy(buf,txt, bufsize);
+            return true;
 
             /* Shift the pattern so that the next
             character in text aligns with the last
