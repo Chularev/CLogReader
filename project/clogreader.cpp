@@ -86,54 +86,45 @@ bool CLogReader::SetFilter(const char *filter)
 
 bool CLogReader::GetNextLine(char *buf, const int bufsize)
 {
-   // int m = pat.size();
-    int n = 1024;
    char *txt;
-   get_line(&txt,n);
-
-    int s = 0; // s is shift of the pattern with
+    int n = 0;
+    while (get_line(&txt,n))
+    {
+        int s = 0; // s is shift of the pattern with
         // respect to text
-    while (s <= (n - filterLength)) {
-        int j = filterLength - 1;
+        while (s <= (n - filterLength)) {
+            int j = filterLength - 1;
 
-        /* Keep reducing index j of pattern while
-        characters of pattern and text are
-        matching at this shift s */
-        while (j >= 0 && filter[j] == txt[s + j])
-            j--;
+            /* Keep reducing index j of pattern while
+            characters of pattern and text are
+            matching at this shift s */
+            while (j >= 0 && filter[j] == txt[s + j])
+                j--;
 
-        /* If the pattern is present at current
-        shift, then index j will become -1 after
-        the above loop */
-        if (j < 0) {
-            std::cout << "pattern occurs at shift = " << s
-                 << std::endl;
+            /* If the pattern is present at current
+            shift, then index j will become -1 after
+            the above loop */
+            if (j < 0) {
+                std::cout << "pattern occurs at shift = " << s
+                     << std::endl;
 
-            strncpy(buf,txt, bufsize);
-            return true;
+                strncpy(buf,txt, bufsize);
+                return true;
+            }
 
-            /* Shift the pattern so that the next
-            character in text aligns with the last
-            occurrence of it in pattern.
-            The condition s+m < n is necessary for
-            the case when pattern occurs at the end
-            of text */
-            s += (s + filterLength < n) ? filterLength - badchar[txt[s + filterLength]] : 1;
+            else
+                /* Shift the pattern so that the bad character
+                in text aligns with the last occurrence of
+                it in pattern. The max function is used to
+                make sure that we get a positive shift.
+                We may get a negative shift if the last
+                occurrence of bad character in pattern
+                is on the right side of the current
+                character. */
+                s += std::max(1, j - badchar[txt[s + j]]);
         }
-
-        else
-            /* Shift the pattern so that the bad character
-            in text aligns with the last occurrence of
-            it in pattern. The max function is used to
-            make sure that we get a positive shift.
-            We may get a negative shift if the last
-            occurrence of bad character in pattern
-            is on the right side of the current
-            character. */
-            s += std::max(1, j - badchar[txt[s + j]]);
     }
     return false;
-    
 }
 
 // Boyer Moore Algorithm

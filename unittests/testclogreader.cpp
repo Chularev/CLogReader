@@ -4,12 +4,16 @@
 TEST(TestCLogReader, Equal) {
     CLogReader reader;
     EXPECT_TRUE(reader.Open("/home/alex/workspace/CLogReader/data/testfile.txt"));
-    reader.SetFilter("HxVG");
+    reader.SetFilter("hxvG");
 
     char buf[10];
     EXPECT_TRUE(reader.GetNextLine(buf,10));
 
-    std::string tmp("wJS4HcNIxD");
+    std::string tmp = "+HP6b4SjDQ";
+    EXPECT_EQ(std::string(buf), tmp);
+
+    EXPECT_TRUE(reader.GetNextLine(buf,10));
+    tmp = "PirGpbO+z5";
     EXPECT_EQ(std::string(buf), tmp);
 
 }
