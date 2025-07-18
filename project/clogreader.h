@@ -1,14 +1,21 @@
+#include <stdio.h>
+
 class CLogReader
-  {
-public:
-           CLogReader();
-          ~CLogReader();
+{
+    public:
+        CLogReader();
+        ~CLogReader();
 
-   bool    Open();                       // открытие файла, false - ошибка
-   void    Close();                         // закрытие файла
+       bool    Open(const char *filePath);                       // открытие файла, false - ошибка
+       void    Close();                         // закрытие файла
 
-   bool    SetFilter(const char *filter);   // установка фильтра строк, false - ошибка
-   bool    GetNextLine(char *buf,           // запрос очередной найденной строки,
-                       const int bufsize);  // buf - буфер, bufsize - максимальная длина
-                                            // false - конец файла или ошибка
-  };
+       bool    SetFilter(const char *filter);   // установка фильтра строк, false - ошибка
+       bool    GetNextLine(char *buf,           // запрос очередной найденной строки,
+                           const int bufsize);  // buf - буфер, bufsize - максимальная длина
+                                                // false - конец файла или ошибка
+   private:
+       bool ReadChunk();
+       FILE *fptr;
+       char data[1024];
+
+};
