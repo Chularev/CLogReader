@@ -6,6 +6,58 @@
 #include <algorithm>
 #include <iostream>
 
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+void read_file_mmap(const char* filename) {
+    int fd = open(filename, O_RDONLY);
+    if (fd == -1) {
+        perror("open");
+        return;
+    }
+
+    struct stat sb;
+    if (fstat(fd, &sb) == -1) {
+        perror("fstat");
+        close(fd);
+        return;
+    }
+
+    char* file_data = (char*)mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (file_data == MAP_FAILED) {
+        perror("mmap");
+        close(fd);
+        return;
+    }
+
+    // Process file_data line by line
+    char* line_start = file_data;
+    char* current = file_data;
+    size_t file_size = sb.st_size;
+
+    while (current < file_data + file_size) {
+        if (*current == '\n') {
+            // Process line from line_start to current
+            size_t line_length = current - line_start;
+            // printf("%.*s\n", (int)line_length, line_start);
+
+            line_start = current + 1;
+        }
+        current++;
+    }
+
+    // Process last line if no trailing newline
+    if (line_start < current) {
+        size_t line_length = current - line_start;
+        // printf("%.*s\n", (int)line_length, line_start);
+    }
+
+    munmap(file_data, sb.st_size);
+    close(fd);
+}
+
 CLogReader::CLogReader()
 {
 }
