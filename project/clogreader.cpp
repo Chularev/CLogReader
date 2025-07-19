@@ -78,27 +78,22 @@ void CLogReader::fillFilter(bool startsWithStar, bool endsWithStar, char* subFil
 {
     if (size == 1 && !startsWithStar && !endsWithStar)
     {
-        filters[filtersLength] = Equal(subFilters[0]);
-        ++filtersLength;
+        filters[filtersLength++] = Equal(subFilters[0]);
         return;
     }
     int index = 0;
     if (!startsWithStar)
     {
-        filters[filtersLength] = SimpleStart(subFilters[index++]);
-        ++filtersLength;
+        filters[filtersLength++] = SimpleStart(subFilters[index++]);
     }
     if (!endsWithStar)
     {
-        --size;
-        filters[filtersLength] = SimpleEnd(subFilters[size]);
-        ++filtersLength;
+        filters[filtersLength++] = SimpleEnd(subFilters[--size]);
     }
 
     for (; index < size; index++)
     {
-        filters[filtersLength] = BoyerMoore(subFilters[index]);
-        ++filtersLength;
+        filters[filtersLength++] = BoyerMoore(subFilters[index]);
     }
 
 
