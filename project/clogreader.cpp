@@ -74,6 +74,36 @@ void  CLogReader::Close()
     close(fileDescriptor);
 }
 
+void CLogReader::fillFilter(bool startsWithStar, bool endsWithStar, char* subFilters[], int size)
+{
+    if (size == 1 && !startsWithStar && !endsWithStar)
+    {
+        filters[filtersLength] = Equal(subFilters[0]);
+        ++filtersLength;
+        return;
+    }
+    int index = 0;
+    if (!startsWithStar)
+    {
+        filters[filtersLength] = SimpleStart(subFilters[index++]);
+        ++filtersLength;
+    }
+    if (!endsWithStar)
+    {
+        --size;
+        filters[filtersLength] = SimpleEnd(subFilters[size]);
+        ++filtersLength;
+    }
+
+    for (; index < size; index++)
+    {
+        filters[filtersLength] = BoyerMoore(subFilters[index]);
+        ++filtersLength;
+    }
+
+
+}
+
 bool CLogReader::SetFilter(const char *filter)
 {
     if (!filter) return false;
@@ -102,9 +132,7 @@ bool CLogReader::SetFilter(const char *filter)
             subFilters[index] = strtok (NULL, "*");
     }
 
-
-    filters[filtersLength] = BoyerMoore(filter);
-    ++filtersLength;
+    fillFilter(startsWithStar, endsWithStar, subFilters, index);
     return true;
 }
 

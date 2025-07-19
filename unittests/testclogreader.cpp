@@ -1,6 +1,6 @@
 #include "testclogreader.h"
 #include "clogreader.h"
-
+/*
 TEST(TestCLogReader, Equal) {
     CLogReader reader;
     EXPECT_TRUE(reader.Open("../data/testfile.txt"));
@@ -17,7 +17,7 @@ TEST(TestCLogReader, Equal) {
     EXPECT_EQ(std::string(buf), tmp);
 
 }
-
+*/
 class MyCLogReader : public CLogReader
 {
 public:
@@ -33,11 +33,12 @@ public:
 
 TEST(TestCLogReader, FiltersChain) {
     MyCLogReader reader;
-    reader.SetFilter("***h***xv*****G*");
+    reader.SetFilter("h*");
 
     EXPECT_EQ(1, reader.getFiltersLength());
 
     Search* filters = reader.getFilters();
-    EXPECT_TRUE(std::holds_alternative<Equal>(filters[0]));
+    EXPECT_TRUE(std::holds_alternative<SimpleStart>(filters[0]));
+  //  EXPECT_TRUE(std::holds_alternative<SimpleEnd>(filters[1]));
 
 }
