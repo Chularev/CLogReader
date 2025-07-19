@@ -8,6 +8,10 @@
 class Equal
 {
 public:
+    Equal(const char *filter)
+    {
+
+    }
     bool search(const char* txt, int n, char* buf, int bufsize)
     {
         return false;
@@ -18,6 +22,10 @@ public:
 class SimpleStart
 {
 public:
+    SimpleStart(const char *filter)
+    {
+
+    }
     bool search(const char* txt, int n, char* buf, int bufsize)
     {
         return false;
@@ -27,6 +35,10 @@ public:
 class SimpleEnd
 {
 public:
+    SimpleEnd(const char *filter)
+    {
+
+    }
     bool search(const char* txt, int n, char* buf, int bufsize)
     {
         return false;
