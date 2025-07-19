@@ -74,7 +74,7 @@ void  CLogReader::Close()
     close(fileDescriptor);
 }
 
-void CLogReader::fillFilter(bool startsWithStar, bool endsWithStar, char* subFilters[], int size)
+void CLogReader::fillFilters(bool startsWithStar, bool endsWithStar, char* subFilters[], int size)
 {
     if (size == 1 && !startsWithStar && !endsWithStar)
     {
@@ -103,6 +103,8 @@ bool CLogReader::SetFilter(const char *filter)
 {
     if (!filter) return false;
 
+    filtersLength = 0;
+
     char* filter_copy = strdup(filter);
 
     bool startsWithStar = (filter[0] == '*');
@@ -115,9 +117,12 @@ bool CLogReader::SetFilter(const char *filter)
 
     while (subFilters[index] != NULL)
     {
+        /*
         std::cout << "----------------"  << "\n";
         std::cout << subFilters[index]  << "\n";
         std::cout << "----------------"  << "\n";
+        */
+
         if (++index == 10)
         {
             std::cerr << "Error: filter can not have more than 10 asterisk"  << "\n";
@@ -127,7 +132,7 @@ bool CLogReader::SetFilter(const char *filter)
             subFilters[index] = strtok (NULL, "*");
     }
 
-    fillFilter(startsWithStar, endsWithStar, subFilters, index);
+    fillFilters(startsWithStar, endsWithStar, subFilters, index);
     return true;
 }
 

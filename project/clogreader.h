@@ -21,7 +21,7 @@ class CLogReader
        int filtersLength = 0;
    private:
        bool get_line(char **line, int& lineLength);
-       void fillFilter(bool startsWithStar, bool endsWithStar, char *subFilters[], int size);
+       void fillFilters(bool startsWithStar, bool endsWithStar, char *subFilters[], int size);
 
        // File
        char* start_position;
