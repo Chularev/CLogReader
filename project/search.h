@@ -7,46 +7,87 @@
 
 class Equal
 {
+    char *filter;
+    int filterLength;
 public:
     Equal() = default;
     Equal(const char *filter)
     {
-
+        strcpy(this->filter,filter);
+        filterLength = strlen(filter);
     }
-    bool search(const char* txt, int n, char* buf, int bufsize)
+    bool search(const char* line, int lineLength, char* buf, int bufsize)
     {
-        return false;
+        if (lineLength != filterLength)
+            return false;
+        for (int i = 0; i < filterLength; i++)
+        {
+            if (filter[i] == '?')
+                continue;
+
+            if (filter[i] != line[i])
+                return false;
+        }
+        return true;
     }
 };
 
 
 class SimpleStart
 {
+    char *filter;
+    int filterLength;
 public:
     SimpleStart() = default;
 
     SimpleStart(const char *filter)
     {
-
+        strcpy(this->filter,filter);
+        filterLength = strlen(filter);
     }
-    bool search(const char* txt, int n, char* buf, int bufsize)
+    bool search(const char* line, int lineLength, char* buf, int bufsize)
     {
-        return false;
+        if (lineLength < filterLength)
+            return false;
+
+        for (int i = 0; i < filterLength; i++)
+        {
+            if (filter[i] == '?')
+                continue;
+
+            if (filter[i] != line[i])
+                return false;
+        }
+        return true;
     }
 };
 
 class SimpleEnd
 {
+    char *filter;
+    int filterLength;
 public:
     SimpleEnd() = default;
 
     SimpleEnd(const char *filter)
     {
-
+        strcpy(this->filter,filter);
+        filterLength = strlen(filter);
     }
-    bool search(const char* txt, int n, char* buf, int bufsize)
+    bool search(const char* line, int lineLength, char* buf, int bufsize)
     {
-        return false;
+        if (lineLength < filterLength)
+            return false;
+
+        for (int i = 0; i < filterLength; i++)
+        {
+            if (filter[i] == '?')
+                continue;
+
+            if (filter[i] != line[lineLength - filterLength + i])
+                return false;
+        }
+        return true;
     }
 
 };
@@ -74,20 +115,25 @@ public:
         // Fill the actual value of last occurrence
         // of a character
         for (i = 0; i < filterLength; i++)
+        {
+            if (filter[i] == '?')
+                continue;
+
             badchar[(int)filter[i]] = i;
+        }
     }
 
-    bool search(const char* txt, int n, char* buf, int bufsize)
+    bool search(const char* line, int lineLength, char* buf, int bufsize)
     {
         int s = 0; // s is shift of the pattern with
         // respect to text
-        while (s <= (n - filterLength)) {
+        while (s <= (lineLength - filterLength)) {
             int j = filterLength - 1;
 
             /* Keep reducing index j of pattern while
             characters of pattern and text are
             matching at this shift s */
-            while (j >= 0 && filter[j] == txt[s + j])
+            while (j >= 0 && filter[j] == line[s + j])
                 j--;
 
             /* If the pattern is present at current
@@ -97,7 +143,7 @@ public:
                 std::cout << "pattern occurs at shift = " << s
                           << std::endl;
 
-                strncpy(buf,txt, bufsize);
+                strncpy(buf,line, bufsize);
                 return true;
             }
 
@@ -110,7 +156,7 @@ public:
                 occurrence of bad character in pattern
                 is on the right side of the current
                 character. */
-                s += std::max(1, j - badchar[txt[s + j]]);
+                s += std::max(1, j - badchar[line[s + j]]);
         }
         return false;
     }
