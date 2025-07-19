@@ -133,7 +133,7 @@ public:
             /* Keep reducing index j of pattern while
             characters of pattern and text are
             matching at this shift s */
-            while (j >= 0 && filter[j] == line[s + j])
+            while (j >= 0 && (filter[j] == line[s + j] || filter[j] == '?'))
                 j--;
 
             /* If the pattern is present at current
