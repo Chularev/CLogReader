@@ -33,7 +33,7 @@ public:
 
 TEST(TestCLogReader, FiltersChain) {
     MyCLogReader reader;
-    reader.SetFilter("hxvG");
+    reader.SetFilter("***h***xv*****G*");
 
     EXPECT_EQ(1, reader.getFiltersLength());
 

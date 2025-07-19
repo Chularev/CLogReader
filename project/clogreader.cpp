@@ -76,6 +76,32 @@ void  CLogReader::Close()
 
 bool CLogReader::SetFilter(const char *filter)
 {
+    if (!filter) return false;
+
+    char* filter_copy = strdup(filter);
+
+    bool startsWithStar = (filter[0] == '*');
+    bool endsWithStar = (filter[strlen(filter) - 1] == '*');
+
+    char* subFilters[10];
+    int index = 0;
+
+    subFilters[index] = strtok (filter_copy,"*");
+
+    while (subFilters[index] != NULL)
+    {
+        std::cout << "----------------"  << "\n";
+        std::cout << subFilters[index]  << "\n";
+        std::cout << "----------------"  << "\n";
+        if (++index == 10)
+        {
+            std::cerr << "Error: filter can not have more than 10 asterisk"  << "\n";
+            return false;
+        }
+        else
+            subFilters[index] = strtok (NULL, "*");
+    }
+
 
     filters[filtersLength] = BoyerMoore(filter);
     ++filtersLength;
