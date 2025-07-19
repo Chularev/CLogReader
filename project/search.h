@@ -7,7 +7,7 @@
 
 class Equal
 {
-    char *filter;
+    char filter[100];
     int filterLength;
 public:
     Equal() = default;
@@ -16,10 +16,11 @@ public:
         strcpy(this->filter,filter);
         filterLength = strlen(filter);
     }
-    bool search(const char* line, int lineLength, char* buf, int bufsize)
+    bool search(const char* line, int lineLength)
     {
         if (lineLength != filterLength)
             return false;
+
         for (int i = 0; i < filterLength; i++)
         {
             if (filter[i] == '?')
@@ -35,7 +36,7 @@ public:
 
 class SimpleStart
 {
-    char *filter;
+    char filter[100];
     int filterLength;
 public:
     SimpleStart() = default;
@@ -45,7 +46,7 @@ public:
         strcpy(this->filter,filter);
         filterLength = strlen(filter);
     }
-    bool search(const char* line, int lineLength, char* buf, int bufsize)
+    bool search(const char* line, int lineLength)
     {
         if (lineLength < filterLength)
             return false;
@@ -64,7 +65,7 @@ public:
 
 class SimpleEnd
 {
-    char *filter;
+    char filter[100];
     int filterLength;
 public:
     SimpleEnd() = default;
@@ -74,7 +75,7 @@ public:
         strcpy(this->filter,filter);
         filterLength = strlen(filter);
     }
-    bool search(const char* line, int lineLength, char* buf, int bufsize)
+    bool search(const char* line, int lineLength)
     {
         if (lineLength < filterLength)
             return false;
@@ -123,7 +124,7 @@ public:
         }
     }
 
-    bool search(const char* line, int lineLength, char* buf, int bufsize)
+    bool search(const char* line, int lineLength)
     {
         int s = 0; // s is shift of the pattern with
         // respect to text
@@ -142,8 +143,6 @@ public:
             if (j < 0) {
                 std::cout << "pattern occurs at shift = " << s
                           << std::endl;
-
-                strncpy(buf,line, std::min(bufsize, lineLength));
                 return true;
             }
 
