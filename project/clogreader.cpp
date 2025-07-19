@@ -154,7 +154,9 @@ bool CLogReader::GetNextLine(char *buf, const int bufsize)
         }
         if (i == filtersLength)
         {
-            strncpy(buf,line, std::min(bufsize, lineLength));
+            memset(buf, 0, bufsize);
+            int min = std::min(bufsize, lineLength);
+            strncpy(buf,line, min);
             return true;
         }
 
