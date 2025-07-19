@@ -138,19 +138,22 @@ bool CLogReader::SetFilter(const char *filter)
 
 bool CLogReader::GetNextLine(char *buf, const int bufsize)
 {
-   char *txt;
+    char *txt;
     int n = 0;
     while (get_line(&txt,n))
     {
-        for (int i = 0; i < filtersLength; i++)
+        int i = 0;
+        for (; i < filtersLength; i++)
         {
-            if (std::visit([&](auto&& arg) {
+            if (!std::visit([&](auto&& arg) {
                     return arg.search(txt,n,buf,bufsize);
                 }, filters[i]))
             {
-                return true;
+                break;
             }
         }
+        if (i == filtersLength)
+            return true;
 
     }
     return false;
