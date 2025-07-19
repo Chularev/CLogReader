@@ -2,8 +2,6 @@
 
 #include <string.h>
 
-#include <iostream>
-
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -78,9 +76,9 @@ void  CLogReader::Close()
 
 bool CLogReader::SetFilter(const char *filter)
 {
-    strcpy(this->filter,filter);
-    filterLength = strlen(filter);
-    badCharHeuristic(filter, strlen(filter));
+
+    filters[filtersLengs] = BoyerMoore(filter);
+    ++filtersLengs;
     return true;
 }
 
@@ -90,54 +88,16 @@ bool CLogReader::GetNextLine(char *buf, const int bufsize)
     int n = 0;
     while (get_line(&txt,n))
     {
-        int s = 0; // s is shift of the pattern with
-        // respect to text
-        while (s <= (n - filterLength)) {
-            int j = filterLength - 1;
-
-            /* Keep reducing index j of pattern while
-            characters of pattern and text are
-            matching at this shift s */
-            while (j >= 0 && filter[j] == txt[s + j])
-                j--;
-
-            /* If the pattern is present at current
-            shift, then index j will become -1 after
-            the above loop */
-            if (j < 0) {
-                std::cout << "pattern occurs at shift = " << s
-                     << std::endl;
-
-                strncpy(buf,txt, bufsize);
+        for (int i = 0; i < filtersLengs; i++)
+        {
+            if (std::visit([&](auto&& arg) {
+                    return arg.search(txt,n,buf,bufsize);
+                }, filters[i]))
+            {
                 return true;
             }
-
-            else
-                /* Shift the pattern so that the bad character
-                in text aligns with the last occurrence of
-                it in pattern. The max function is used to
-                make sure that we get a positive shift.
-                We may get a negative shift if the last
-                occurrence of bad character in pattern
-                is on the right side of the current
-                character. */
-                s += std::max(1, j - badchar[txt[s + j]]);
         }
+
     }
     return false;
-}
-
-// Boyer Moore Algorithm
-void CLogReader::badCharHeuristic(const char *filter, int size)
-{
-    int i;
-
-    // Initialize all occurrences as -1
-    for (i = 0; i < NO_OF_CHARS; i++)
-        badchar[i] = -1;
-
-    // Fill the actual value of last occurrence
-    // of a character
-    for (i = 0; i < size; i++)
-        badchar[(int)filter[i]] = i;
 }

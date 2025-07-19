@@ -12,7 +12,8 @@ target_include_directories(CLogReader_lib PUBLIC
 )
 
 add_executable(CLogReader
-    main.cpp 
+    main.cpp
+    search.h
 )
 
 target_link_libraries(

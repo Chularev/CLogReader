@@ -1,6 +1,8 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
+#include "search.h"
+
 class CLogReader
 {
     public:
@@ -14,9 +16,11 @@ class CLogReader
        bool    GetNextLine(char *buf,           // запрос очередной найденной строки,
                            const int bufsize);  // buf - буфер, bufsize - максимальная длина
                                                 // false - конец файла или ошибка
+   protected:
+       Search filters [10];
+       int filtersLengs = 0;
    private:
        bool get_line(char **line, int& lineLength);
-       void badCharHeuristic(const char *filter, int size);
 
        // File
        char* start_position;
@@ -25,11 +29,5 @@ class CLogReader
        char* line_start = start_position;
        char* current_position = start_position;
        size_t data_size;
-
-       char filter[100];
-       int  filterLength = -1;
-
-       static const int NO_OF_CHARS = 256;
-       int badchar[NO_OF_CHARS];
 
 };
