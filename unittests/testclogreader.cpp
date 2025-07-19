@@ -17,3 +17,27 @@ TEST(TestCLogReader, Equal) {
     EXPECT_EQ(std::string(buf), tmp);
 
 }
+
+class MyCLogReader : public CLogReader
+{
+public:
+    Search* getFilters()
+    {
+        return filters;
+    }
+    int getFiltersLength()
+    {
+        return filtersLength;
+    }
+};
+
+TEST(TestCLogReader, FiltersChain) {
+    MyCLogReader reader;
+    reader.SetFilter("hxvG");
+
+    EXPECT_EQ(1, reader.getFiltersLength());
+
+    Search* filters = reader.getFilters();
+    EXPECT_TRUE(std::holds_alternative<Equal>(filters[0]));
+
+}

@@ -77,8 +77,8 @@ void  CLogReader::Close()
 bool CLogReader::SetFilter(const char *filter)
 {
 
-    filters[filtersLengs] = BoyerMoore(filter);
-    ++filtersLengs;
+    filters[filtersLength] = BoyerMoore(filter);
+    ++filtersLength;
     return true;
 }
 
@@ -88,7 +88,7 @@ bool CLogReader::GetNextLine(char *buf, const int bufsize)
     int n = 0;
     while (get_line(&txt,n))
     {
-        for (int i = 0; i < filtersLengs; i++)
+        for (int i = 0; i < filtersLength; i++)
         {
             if (std::visit([&](auto&& arg) {
                     return arg.search(txt,n,buf,bufsize);

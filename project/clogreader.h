@@ -18,7 +18,7 @@ class CLogReader
                                                 // false - конец файла или ошибка
    protected:
        Search filters [10];
-       int filtersLengs = 0;
+       int filtersLength = 0;
    private:
        bool get_line(char **line, int& lineLength);
 
@@ -26,8 +26,8 @@ class CLogReader
        char* start_position;
        int fileDescriptor;
        struct stat sb;
-       char* line_start = start_position;
-       char* current_position = start_position;
+       char* line_start;
+       char* current_position;
        size_t data_size;
 
 };

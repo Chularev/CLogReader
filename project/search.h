@@ -5,6 +5,16 @@
 #include <string.h>
 #include <iostream>
 
+class Equal
+{
+public:
+    bool search(const char* txt, int n, char* buf, int bufsize)
+    {
+        return false;
+    }
+};
+
+
 class SimpleStart
 {
 public:
@@ -89,6 +99,6 @@ public:
 
 };
 
-using Search = std::variant<SimpleStart, SimpleEnd, BoyerMoore>;
+using Search = std::variant<Equal, SimpleStart, SimpleEnd, BoyerMoore>;
 
 #endif // SEARCH_H
