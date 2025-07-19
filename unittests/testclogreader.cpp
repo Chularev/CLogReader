@@ -3,7 +3,7 @@
 
 TEST(TestCLogReader, Equal) {
     CLogReader reader;
-    EXPECT_TRUE(reader.Open("/home/alex/workspace/CLogReader/data/testfile.txt"));
+    EXPECT_TRUE(reader.Open("../data/testfile.txt"));
     reader.SetFilter("hxvG");
 
     char buf[10];
