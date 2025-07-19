@@ -141,8 +141,6 @@ public:
             shift, then index j will become -1 after
             the above loop */
             if (j < 0) {
-                std::cout << "pattern occurs at shift = " << s
-                          << std::endl;
                 return true;
             }
 
