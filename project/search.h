@@ -143,7 +143,7 @@ public:
                 std::cout << "pattern occurs at shift = " << s
                           << std::endl;
 
-                strncpy(buf,line, bufsize);
+                strncpy(buf,line, std::min(bufsize, lineLength));
                 return true;
             }
 
