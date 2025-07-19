@@ -8,6 +8,7 @@
 class Equal
 {
 public:
+    Equal() = default;
     Equal(const char *filter)
     {
 
@@ -22,6 +23,8 @@ public:
 class SimpleStart
 {
 public:
+    SimpleStart() = default;
+
     SimpleStart(const char *filter)
     {
 
@@ -35,6 +38,8 @@ public:
 class SimpleEnd
 {
 public:
+    SimpleEnd() = default;
+
     SimpleEnd(const char *filter)
     {
 
@@ -54,6 +59,7 @@ class BoyerMoore
     int  filterLength = -1;
 
 public:
+    BoyerMoore() = default;
     BoyerMoore(const char *filter)
     {
         strcpy(this->filter,filter);
