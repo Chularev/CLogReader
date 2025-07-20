@@ -3,6 +3,7 @@
 
 #include <variant>
 #include <string.h>
+#include <stdio.h>
 #include <algorithm>
 
 class Equal
@@ -13,7 +14,7 @@ public:
     Equal() = default;
     Equal(const char *filter)
     {
-        strcpy(this->filter,filter);
+        snprintf(this->filter, sizeof(this->filter), "%s", filter);
         filterLength = strlen(filter);
     }
     bool search(char** line, int &lineLength)
@@ -45,7 +46,7 @@ public:
 
     SimpleStart(const char *filter)
     {
-        strcpy(this->filter,filter);
+        snprintf(this->filter, sizeof(this->filter), "%s", filter);
         filterLength = strlen(filter);
     }
     bool search(char** line, int &lineLength)
@@ -76,7 +77,7 @@ public:
 
     SimpleEnd(const char *filter)
     {
-        strcpy(this->filter,filter);
+        snprintf(this->filter, sizeof(this->filter), "%s", filter);
         filterLength = strlen(filter);
     }
     bool search(char** line, int &lineLength)
@@ -180,7 +181,7 @@ public:
 
     BoyerMoore(const char *filter)
     {
-        strcpy(this->filter,filter);
+        snprintf(this->filter, sizeof(this->filter), "%s", filter);
         filterLength = strlen(filter);
         badCharHeuristic();
 

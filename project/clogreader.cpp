@@ -104,10 +104,17 @@ bool CLogReader::SetFilter(const char *filter)
         std::cerr << "Filter can not be empty" << std::endl;
         return false;
     }
+    int filterLength = strlen(filter);
+    if (filterLength > 100)
+    {
+        std::cerr << "Filter length must be less than 100";
+        return false;
+    }
+
+    char filter_copy[100];
+    snprintf(filter_copy, sizeof(filter_copy), "%s", filter);
 
     filtersLength = 0;
-
-    char* filter_copy = strdup(filter);
 
     bool startsWithStar = (filter[0] == '*');
     bool endsWithStar = (filter[strlen(filter) - 1] == '*');
