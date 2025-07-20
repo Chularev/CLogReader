@@ -126,7 +126,7 @@ bool CLogReader::SetFilter(const char *filter)
 
 bool CLogReader::GetNextLine(char *buf, const int bufsize)
 {
-     while (MoveToNextLine())
+    while (MoveToNextLine())
     {
         int lineLength = line_end - line_start;
 
