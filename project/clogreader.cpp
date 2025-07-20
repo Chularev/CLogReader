@@ -62,7 +62,7 @@ void  CLogReader::Close()
     close(fileDescriptor);
 }
 
-void CLogReader::fillFilters(bool startsWithStar, bool endsWithStar, char* subFilters[], int size)
+void CLogReader::FillFilters(bool startsWithStar, bool endsWithStar, char* subFilters[], int size)
 {
     if (size == 1 && !startsWithStar && !endsWithStar)
     {
@@ -120,7 +120,7 @@ bool CLogReader::SetFilter(const char *filter)
             subFilters[index] = strtok (NULL, "*");
     }
 
-    fillFilters(startsWithStar, endsWithStar, subFilters, index);
+    FillFilters(startsWithStar, endsWithStar, subFilters, index);
     return true;
 }
 

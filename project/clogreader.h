@@ -21,7 +21,7 @@ class CLogReader
        int filtersLength = 0;
    private:
        bool MoveToNextLine();
-       void fillFilters(bool startsWithStar, bool endsWithStar, char *subFilters[], int size);
+       void FillFilters(bool startsWithStar, bool endsWithStar, char *subFilters[], int size);
 
        // File
        int fileDescriptor;
