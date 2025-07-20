@@ -103,17 +103,15 @@ class BoyerMoore
     static const int NO_OF_CHARS = 256;
     int badchar[NO_OF_CHARS];
     char filter[100];
+    int shift[100];
+    int shiftLength = -1;
     int  filterLength = -1;
 
 public:
     BoyerMoore() = default;
-    BoyerMoore(const char *filter)
+    void badCharHeuristic()
     {
-        strcpy(this->filter,filter);
-        filterLength = strlen(filter);
-
         int i;
-
         // Initialize all occurrences as -1
         for (i = 0; i < NO_OF_CHARS; i++)
             badchar[i] = -1;
@@ -127,6 +125,76 @@ public:
 
             badchar[(int)filter[i]] = i;
         }
+    }
+
+    // preprocessing for strong good suffix rule
+    void preprocess_strong_suffix(int *bpos)
+    {
+        // m is the length of pattern
+        int i=filterLength, j=filterLength+1;
+        bpos[i]=j;
+
+        while(i>0)
+        {
+            /*if character at position i-1 is not equivalent to
+          character at j-1, then continue searching to right
+          of the pattern for border */
+            while(j<=filterLength && (
+                       (filter[i-1] != filter[j-1]) || filter[i-1] == '?' || filter[j-1] == '?'))
+            {
+                /* the character preceding the occurrence of t in
+               pattern P is different than the mismatching character in P,
+               we stop skipping the occurrences and shift the pattern
+               from i to j */
+                if (shift[j]==0)
+                    shift[j] = j-i;
+
+                //Update the position of next border
+                j = bpos[j];
+            }
+            /* p[i-1] matched with p[j-1], border is found.
+           store the  beginning position of border */
+            i--;j--;
+            bpos[i] = j;
+        }
+    }
+
+    //Preprocessing for case 2
+    void preprocess_case2(int *bpos)
+    {
+        int i, j;
+        j = bpos[0];
+        for(i=0; i<=filterLength; i++)
+        {
+            /* set the border position of the first character of the pattern
+           to all indices in array shift having shift[i] = 0 */
+            if(shift[i]==0)
+                shift[i] = j;
+
+            /* suffix becomes shorter than bpos[0], use the position of
+           next widest border as value of j */
+            if (i==j)
+                j = bpos[j];
+        }
+    }
+
+    BoyerMoore(const char *filter)
+    {
+        strcpy(this->filter,filter);
+        filterLength = strlen(filter);
+        badCharHeuristic();
+
+        int m = filterLength;
+
+        int bpos[filterLength+1];
+        shiftLength = filterLength+1;
+
+        //initialize all occurrence of shift to 0
+        for(int i=0;i<m+1;i++) shift[i]=0;
+
+        //do preprocessing
+        preprocess_strong_suffix(bpos);
+        preprocess_case2(bpos);
     }
 
     bool search(char** line, int &lineLength)
@@ -153,6 +221,7 @@ public:
             }
 
             else
+            {
                 /* Shift the pattern so that the bad character
                 in text aligns with the last occurrence of
                 it in pattern. The max function is used to
@@ -161,7 +230,9 @@ public:
                 occurrence of bad character in pattern
                 is on the right side of the current
                 character. */
-                s += std::max(1, j - badchar[(*line)[s + j]]);
+                int badShift = std::max(1, j - badchar[(*line)[s + j]]);
+                s += std::max(shift[j+1], badShift);
+            }
         }
         return false;
     }
