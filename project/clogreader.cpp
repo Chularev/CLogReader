@@ -16,7 +16,7 @@ bool CLogReader::MoveToNextLine()
         line_end++;
     }
     // Last line
-    if (line_end < data + data_size)
+    if (line_start < data + data_size)
         return true;
     return false;
 }
