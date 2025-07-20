@@ -128,13 +128,15 @@ bool CLogReader::GetNextLine(char *buf, const int bufsize)
 {
     while (MoveToNextLine())
     {
+        // if search will be success it will be reduce
         int lineLength = line_end - line_start;
+        char *line = line_start;
 
         int i = 0;
         for (; i < filtersLength; i++)
         {
             if (!std::visit([&](auto&& arg) {
-                    return arg.search(line_start,lineLength);
+                    return arg.search(line,lineLength);
                 }, filters[i]))
             {
                 break;
