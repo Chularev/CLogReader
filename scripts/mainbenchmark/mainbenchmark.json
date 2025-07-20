@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2025-07-16T21:59:58+07:00",
+    "date": "2025-07-20T17:25:51+07:00",
     "host_name": "alex-Nitro-AN517-54",
     "executable": "../../benchmark/mainbenchmark",
     "num_cpus": 12,
@@ -33,7 +33,7 @@
         "num_sharing": 12
       }
     ],
-    "load_avg": [0.569336,0.534668,0.428223],
+    "load_avg": [0.322266,0.185059,0.112793],
     "library_version": "v1.9.4-11-g8516492e",
     "library_build_type": "release",
     "json_schema_version": 1
@@ -48,9 +48,9 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 10,
-      "real_time": 8.1065698596699982e+10,
-      "cpu_time": 6.2151499999999956e+04,
+      "iterations": 1000,
+      "real_time": 5.3286273289995734e+06,
+      "cpu_time": 3.6635680999999997e+04,
       "time_unit": "ns"
     }
   ]
