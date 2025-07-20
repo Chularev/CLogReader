@@ -6,29 +6,18 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-bool CLogReader::get_line(char **line, int& lineLength) {
-
-    while (current_position < start_position + data_size) {
-        if (*current_position == '\n') {
-            lineLength = current_position - line_start;
-            *line = line_start;
-            line_start = current_position + 1;
-            current_position++;
+bool CLogReader::MoveToNextLine()
+{
+    line_start = ++line_end;
+    while (line_end < data + data_size) {
+        if (*line_end == '\n') {
             return true;
         }
-        current_position++;
+        line_end++;
     }
-
-    // Process last line if no trailing newline
-    if (line_start < current_position) {
-        lineLength = current_position - line_start;
-        *line = line_start;
-        line_start = current_position + 1;
-        current_position++;
+    // Last line
+    if (line_end < data + data_size)
         return true;
-        //size_t line_length = current_position - line_start;
-        // printf("%.*s\n", (int)line_length, line_start);
-    }
     return false;
 }
 
@@ -55,22 +44,21 @@ bool CLogReader::Open(const char *filePath)
         return false;
     }
 
-    start_position = (char*)mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fileDescriptor, 0);
-    if (start_position == MAP_FAILED) {
+    data = (char*)mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fileDescriptor, 0);
+    if (data == MAP_FAILED) {
         perror("mmap");
         close(fileDescriptor);
         return false;
     }
 
-    line_start = start_position;
-    current_position = start_position;
+    line_end = data - 1;
     data_size = sb.st_size;
 
     return true;
 }
 void  CLogReader::Close()
 {
-    munmap(start_position, sb.st_size);
+    munmap(data, sb.st_size);
     close(fileDescriptor);
 }
 
@@ -138,15 +126,15 @@ bool CLogReader::SetFilter(const char *filter)
 
 bool CLogReader::GetNextLine(char *buf, const int bufsize)
 {
-    char *line;
-    int lineLength = 0;
-    while (get_line(&line,lineLength))
+     while (MoveToNextLine())
     {
+        int lineLength = line_end - line_start;
+
         int i = 0;
         for (; i < filtersLength; i++)
         {
             if (!std::visit([&](auto&& arg) {
-                    return arg.search(line,lineLength);
+                    return arg.search(line_start,lineLength);
                 }, filters[i]))
             {
                 break;
@@ -156,7 +144,7 @@ bool CLogReader::GetNextLine(char *buf, const int bufsize)
         {
             memset(buf, 0, bufsize);
             int min = std::min(bufsize, lineLength);
-            strncpy(buf,line, min);
+            strncpy(buf,line_start, min);
             return true;
         }
 

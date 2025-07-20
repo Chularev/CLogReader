@@ -20,15 +20,16 @@ class CLogReader
        Search filters [10];
        int filtersLength = 0;
    private:
-       bool get_line(char **line, int& lineLength);
+       bool MoveToNextLine();
        void fillFilters(bool startsWithStar, bool endsWithStar, char *subFilters[], int size);
 
        // File
-       char* start_position;
        int fileDescriptor;
        struct stat sb;
        char* line_start;
-       char* current_position;
+       char* line_end;
+
+       char* data;
        size_t data_size;
 
 };
