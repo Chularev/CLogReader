@@ -29,6 +29,8 @@ public:
             if (filter[i] != (*line)[i])
                 return false;
         }
+        lineLength = 0;
+        (*line) += filterLength;
         return true;
     }
 };
@@ -59,6 +61,8 @@ public:
             if (filter[i] != (*line)[i])
                 return false;
         }
+        (*line) += filterLength;
+        lineLength -= filterLength;
         return true;
     }
 };
@@ -88,6 +92,7 @@ public:
             if (filter[i] != (*line)[lineLength - filterLength + i])
                 return false;
         }
+        lineLength -= filterLength;
         return true;
     }
 
@@ -141,6 +146,9 @@ public:
             shift, then index j will become -1 after
             the above loop */
             if (j < 0) {
+                int offset = s + filterLength - 1;
+                (*line) += offset;
+                lineLength -= offset;
                 return true;
             }
 
