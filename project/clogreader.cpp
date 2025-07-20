@@ -3,7 +3,6 @@
 #include <string.h>
 #include <iostream>
 
-#include <sys/mman.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -28,26 +27,26 @@ CLogReader::CLogReader()
 
 CLogReader::~CLogReader()
 {
-
+    Close();
 }
 
 bool CLogReader::Open(const char *filePath)
 {
     fileDescriptor = open(filePath, O_RDONLY);
     if (fileDescriptor == -1) {
-        perror("open");
+        std::cerr << "Can not open file" << std::endl;
         return false;
     }
 
     if (fstat(fileDescriptor, &sb) == -1) {
-        perror("fstat");
+        std::cerr << "Can not get file info" << std::endl;
         close(fileDescriptor);
         return false;
     }
 
     data = (char*)mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fileDescriptor, 0);
     if (data == MAP_FAILED) {
-        perror("mmap");
+        std::cerr << "Can not map data to memory" << std::endl;
         close(fileDescriptor);
         return false;
     }
@@ -59,8 +58,17 @@ bool CLogReader::Open(const char *filePath)
 }
 void  CLogReader::Close()
 {
-    munmap(data, sb.st_size);
-    close(fileDescriptor);
+    if (data != MAP_FAILED)
+    {
+        munmap(data, sb.st_size);
+        data = static_cast<char*>(MAP_FAILED);
+    }
+
+    if (fileDescriptor != -1)
+    {
+        close(fileDescriptor);
+        fileDescriptor = -1;
+    }
 }
 
 void CLogReader::FillFilters(bool startsWithStar, bool endsWithStar, char* subFilters[], int size)
@@ -90,7 +98,11 @@ void CLogReader::FillFilters(bool startsWithStar, bool endsWithStar, char* subFi
 
 bool CLogReader::SetFilter(const char *filter)
 {
-    if (!filter) return false;
+    if (!filter)
+    {
+        std::cerr << "Filter can not be empty" << std::endl;
+        return false;
+    }
 
     filtersLength = 0;
 
@@ -106,12 +118,6 @@ bool CLogReader::SetFilter(const char *filter)
 
     while (subFilters[index] != NULL)
     {
-        /*
-        std::cout << "----------------"  << "\n";
-        std::cout << subFilters[index]  << "\n";
-        std::cout << "----------------"  << "\n";
-        */
-
         if (++index == 10)
         {
             std::cerr << "Error: filter can not have more than 10 asterisk"  << "\n";
@@ -124,9 +130,35 @@ bool CLogReader::SetFilter(const char *filter)
     FillFilters(startsWithStar, endsWithStar, subFilters, index);
     return true;
 }
-
+bool CLogReader::GetNextLineTest(int bufsize, char *buf)
+{
+    if (fileDescriptor < 0)
+    {
+        std::cerr << "File with data do not open yet";
+        return false;
+    }
+    if (filtersLength < 0)
+    {
+        std::cerr << "Filter do not set yet";
+        return false;
+    }
+    if (bufsize < 1)
+    {
+        std::cerr << "Buffer size must be more than 0";
+        return false;
+    }
+    if (buf == nullptr)
+    {
+        std::cerr << "Buffer can not be null";
+        return false;
+    }
+    return true;
+}
 bool CLogReader::GetNextLine(char *buf, const int bufsize)
 {
+    if (!GetNextLineTest(bufsize, buf))
+        return false;
+
     while (MoveToNextLine())
     {
         // if search will be success it will be reduce

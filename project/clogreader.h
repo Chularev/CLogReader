@@ -1,6 +1,8 @@
 #include <sys/stat.h>
 #include <stdio.h>
 
+#include <sys/mman.h>
+
 #include "search.h"
 
 class CLogReader
@@ -21,15 +23,16 @@ class CLogReader
        int filtersLength = 0;
    private:
        bool MoveToNextLine();
+       bool GetNextLineTest(int bufsize, char *buf);
        void FillFilters(bool startsWithStar, bool endsWithStar, char *subFilters[], int size);
 
        // File
-       int fileDescriptor;
+       int fileDescriptor = -1;
        struct stat sb;
        char* line_start;
        char* line_end;
 
-       char* data;
+       char*  data = static_cast<char*>(MAP_FAILED);
        size_t data_size;
 
 };

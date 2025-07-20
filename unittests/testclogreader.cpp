@@ -1,7 +1,7 @@
 #include "testclogreader.h"
 #include "clogreader.h"
 
-TEST(TestCLogReader, Equal) {
+TEST(TestCLogReader, Search) {
     CLogReader reader;
     EXPECT_TRUE(reader.Open("../data/testfile.txt"));
     reader.SetFilter("*BIOS-e820*");
@@ -32,5 +32,12 @@ TEST(TestCLogReader, Equal) {
     EXPECT_TRUE(reader.GetNextLine(buf,400));
     tmp = "Jul 19 11:01:37 alex-Nitro-AN517-54 /usr/libexec/gdm-x-session[2215]: (**) Option \"fd\" \"43\"";
     EXPECT_EQ(std::string(buf), tmp);
+
+}
+TEST(TestCLogReader, Safety)
+{
+    CLogReader reader;
+    EXPECT_TRUE(reader.Open("../data/testfile.txt"));
+
 
 }
