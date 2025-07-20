@@ -5,6 +5,7 @@ project(CLogReader LANGUAGES CXX)
 add_library(CLogReader_lib STATIC
         clogreader.cpp
         clogreader.h
+        search.h
 )
 
 target_include_directories(CLogReader_lib PUBLIC
@@ -13,7 +14,6 @@ target_include_directories(CLogReader_lib PUBLIC
 
 add_executable(CLogReader
     main.cpp
-    search.h
 )
 
 target_link_libraries(
