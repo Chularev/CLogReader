@@ -44,7 +44,8 @@ bool CLogReader::Open(const char *filePath)
         return false;
     }
 
-    data = (char*)mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fileDescriptor, 0);
+    void *data_ptr = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fileDescriptor, 0);
+    data = static_cast<char*>(data_ptr);
     if (data == MAP_FAILED) {
         std::cerr << "Can not map data to memory" << std::endl;
         close(fileDescriptor);
