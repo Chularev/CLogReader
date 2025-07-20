@@ -1,6 +1,7 @@
 #include "clogreader.h"
 
 #include <string.h>
+#include <iostream>
 
 #include <sys/mman.h>
 #include <fcntl.h>
@@ -136,7 +137,7 @@ bool CLogReader::GetNextLine(char *buf, const int bufsize)
         for (; i < filtersLength; i++)
         {
             if (!std::visit([&](auto&& arg) {
-                    return arg.search(line,lineLength);
+                    return arg.search(&line,lineLength);
                 }, filters[i]))
             {
                 break;

@@ -3,7 +3,7 @@
 
 #include <variant>
 #include <string.h>
-#include <iostream>
+#include <algorithm>
 
 class Equal
 {
@@ -16,7 +16,7 @@ public:
         strcpy(this->filter,filter);
         filterLength = strlen(filter);
     }
-    bool search(const char* line, int lineLength)
+    bool search(char** line, int &lineLength)
     {
         if (lineLength != filterLength)
             return false;
@@ -26,7 +26,7 @@ public:
             if (filter[i] == '?')
                 continue;
 
-            if (filter[i] != line[i])
+            if (filter[i] != (*line)[i])
                 return false;
         }
         return true;
@@ -46,7 +46,7 @@ public:
         strcpy(this->filter,filter);
         filterLength = strlen(filter);
     }
-    bool search(const char* line, int lineLength)
+    bool search(char** line, int &lineLength)
     {
         if (lineLength < filterLength)
             return false;
@@ -56,7 +56,7 @@ public:
             if (filter[i] == '?')
                 continue;
 
-            if (filter[i] != line[i])
+            if (filter[i] != (*line)[i])
                 return false;
         }
         return true;
@@ -75,7 +75,7 @@ public:
         strcpy(this->filter,filter);
         filterLength = strlen(filter);
     }
-    bool search(const char* line, int lineLength)
+    bool search(char** line, int &lineLength)
     {
         if (lineLength < filterLength)
             return false;
@@ -85,7 +85,7 @@ public:
             if (filter[i] == '?')
                 continue;
 
-            if (filter[i] != line[lineLength - filterLength + i])
+            if (filter[i] != (*line)[lineLength - filterLength + i])
                 return false;
         }
         return true;
@@ -124,7 +124,7 @@ public:
         }
     }
 
-    bool search(const char* line, int lineLength)
+    bool search(char** line, int &lineLength)
     {
         int s = 0; // s is shift of the pattern with
         // respect to text
@@ -134,7 +134,7 @@ public:
             /* Keep reducing index j of pattern while
             characters of pattern and text are
             matching at this shift s */
-            while (j >= 0 && (filter[j] == line[s + j] || filter[j] == '?'))
+            while (j >= 0 && (filter[j] == (*line)[s + j] || filter[j] == '?'))
                 j--;
 
             /* If the pattern is present at current
@@ -153,7 +153,7 @@ public:
                 occurrence of bad character in pattern
                 is on the right side of the current
                 character. */
-                s += std::max(1, j - badchar[line[s + j]]);
+                s += std::max(1, j - badchar[(*line)[s + j]]);
         }
         return false;
     }
